@@ -7,6 +7,11 @@ on:
     tags:
       - 'v*'
 
+# Each prebuild job builds the native addon with cmake-js and stages
+# build/bindings.node (plus, on Windows, the ICU runtime DLLs the CMake
+# post-build copies next to it) into prebuilds/<platform>-<arch>/ — the exact
+# layout lib/load-binding.js looks for. The publish job collects all three.
+
 jobs:
   prebuild_linux:
     name: Prebuild (Linux)
@@ -20,10 +25,12 @@ jobs:
           node-version: '20'
       - name: Install ICU dev libraries
         run: sudo apt-get update && sudo apt-get install -y libicu-dev
-      - name: Install deps
+      - name: Install deps (no build)
         run: npm install --ignore-scripts
-      - name: Prebuild
-        run: npx prebuildify --napi --strip --tag-libc
+      - name: Build
+        run: npm run build
+      - name: Stage prebuild
+        run: node scripts/stage-prebuild.js
       - uses: actions/upload-artifact@v4
         with:
           name: prebuilds-linux
@@ -45,12 +52,14 @@ jobs:
         run: |
           git clone --depth 1 https://github.com/Microsoft/vcpkg.git
           ./vcpkg/bootstrap-vcpkg.sh
-      - name: Install deps
+      - name: Install deps (no build)
         run: npm install --ignore-scripts
-      - name: Prebuild
+      - name: Build
         env:
           CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-        run: npx prebuildify --napi --strip
+        run: npm run build
+      - name: Stage prebuild
+        run: node scripts/stage-prebuild.js
       - uses: actions/upload-artifact@v4
         with:
           name: prebuilds-macos
@@ -66,19 +75,21 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '20'
-      - name: vcpkg build
+      - name: vcpkg build (ICU)
         uses: johnwason/vcpkg-action@v6
         with:
           manifest-dir: ${{ github.workspace }}
-          triplet: x64-windows-release
+          triplet: x64-windows
           token: ${{ github.token }}
           github-binarycache: true
-      - name: Install deps
+      - name: Install deps (no build)
         run: npm install --ignore-scripts
-      - name: Prebuild
+      - name: Build
         env:
           CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
-        run: npx prebuildify --napi
+        run: npm run build
+      - name: Stage prebuild (addon + ICU DLLs)
+        run: node scripts/stage-prebuild.js
       - uses: actions/upload-artifact@v4
         with:
           name: prebuilds-windows

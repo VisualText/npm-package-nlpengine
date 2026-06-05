@@ -65,6 +65,30 @@ if(MSVC AND CMAKE_JS_NODELIB_DEF AND CMAKE_JS_NODELIB_TARGET)
   execute_process(COMMAND ${CMAKE_AR} /def:${CMAKE_JS_NODELIB_DEF} /out:${CMAKE_JS_NODELIB_TARGET} ${CMAKE_STATIC_LINKER_FLAGS})
 endif()
 
+# On Windows, stage the ICU runtime DLLs next to the addon so it loads without
+# ICU on the system PATH (the Node equivalent of what delvewheel does for the
+# Python wheel). The import libs live in <prefix>/lib; the matching DLLs live
+# in the sibling <prefix>/bin. The loader (lib/load-binding.js) prepends the
+# addon's directory to the DLL search path at runtime.
+if(WIN32)
+  set(_icu_uc_lib "${ICU_UC_LIBRARY}")
+  if(NOT _icu_uc_lib AND ICU_UC_LIBRARY_RELEASE)
+    set(_icu_uc_lib "${ICU_UC_LIBRARY_RELEASE}")
+  endif()
+  if(_icu_uc_lib)
+    get_filename_component(_icu_libdir "${_icu_uc_lib}" DIRECTORY)
+    get_filename_component(_icu_prefix "${_icu_libdir}" DIRECTORY)
+    file(GLOB _icu_dlls "${_icu_prefix}/bin/icu*.dll")
+    if(_icu_dlls)
+      add_custom_command(TARGET bindings POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different ${_icu_dlls} "$<TARGET_FILE_DIR:bindings>"
+        COMMENT "Staging ICU runtime DLLs next to bindings.node")
+    else()
+      message(WARNING "No ICU DLLs found under ${_icu_prefix}/bin; the addon may fail to load at runtime unless ICU is on PATH.")
+    endif()
+  endif()
+endif()
+
 # Forward the engine version (parsed from nlp-engine/nlp/main.cpp) to the
 # binding as a compile-time string, so engineVersion() can report it for the
 # cloud-compile manifest.

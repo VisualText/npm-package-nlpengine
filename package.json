@@ -52,9 +52,6 @@
     "node-addon-api": "^8.0.0",
     "tar": "^7.4.0"
   },
-  "devDependencies": {
-    "prebuildify": "^6.0.0"
-  },
   "binary": {
     "napi_versions": [
       8
