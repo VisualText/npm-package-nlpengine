@@ -17,8 +17,9 @@
   "files": [
     "index.js",
     "index.d.ts",
-    "lib/",
+    "lib/*.js",
     "src/",
+    "scripts/",
     "CMakeLists.txt",
     "vcpkg.json",
     "analyzers/",

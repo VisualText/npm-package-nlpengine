@@ -1,0 +1,23 @@
+# Keep the published tarball free of build artifacts and stray binaries.
+# (The `files` allowlist in package.json controls what's included; this
+# trims unwanted files from within those allowed paths.)
+
+# Native/compiled build outputs
+*.lib
+*.exe
+*.dll
+*.exp
+*.pdb
+*.ilk
+*.obj
+*.o
+build/
+
+# ...but DO ship the prebuilt addon + its bundled ICU runtime DLLs.
+!prebuilds/**/*.node
+!prebuilds/**/*.dll
+
+# VCS / CI / dev noise that may live inside otherwise-shipped dirs
+.github/
+.git/
+*.log
