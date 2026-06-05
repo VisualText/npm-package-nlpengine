@@ -111,16 +111,21 @@ jobs:
         with:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
+      # Trusted publishing (OIDC) needs npm >= 11.5.1; Node 20 ships npm 10.
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@latest
       - name: Download all prebuilds
         uses: actions/download-artifact@v4
         with:
           pattern: prebuilds-*
           path: prebuilds
           merge-multiple: true
+      # No NODE_AUTH_TOKEN: this authenticates via OIDC against the npm
+      # "Trusted Publisher" configured for this repo + workflow
+      # (npmjs.com -> nlpplus -> Settings -> Trusted Publisher). Provenance
+      # is generated automatically from the OIDC claims.
       - name: Publish
         run: npm publish --provenance --access public
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: GitHub release
         uses: softprops/action-gh-release@v2
         with:
