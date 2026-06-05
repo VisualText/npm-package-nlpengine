@@ -1,0 +1,9 @@
+# Normalize line endings: keep LF in the repo for text/source files.
+* text=auto eol=lf
+
+# Treat known binary assets as binary (no eol conversion).
+*.png binary
+*.dll binary
+*.so binary
+*.dylib binary
+*.node binary

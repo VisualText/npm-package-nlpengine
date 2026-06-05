@@ -1,0 +1,116 @@
+name: Build prebuilds and publish to npm
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  prebuild_linux:
+    name: Prebuild (Linux)
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install ICU dev libraries
+        run: sudo apt-get update && sudo apt-get install -y libicu-dev
+      - name: Install deps
+        run: npm install --ignore-scripts
+      - name: Prebuild
+        run: npx prebuildify --napi --strip --tag-libc
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prebuilds-linux
+          path: prebuilds/
+
+  prebuild_macos:
+    name: Prebuild (macOS)
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install build tools
+        run: brew install autoconf-archive autoconf automake pkg-config
+      - name: vcpkg setup
+        run: |
+          git clone --depth 1 https://github.com/Microsoft/vcpkg.git
+          ./vcpkg/bootstrap-vcpkg.sh
+      - name: Install deps
+        run: npm install --ignore-scripts
+      - name: Prebuild
+        env:
+          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        run: npx prebuildify --napi --strip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prebuilds-macos
+          path: prebuilds/
+
+  prebuild_windows:
+    name: Prebuild (Windows)
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: vcpkg build
+        uses: johnwason/vcpkg-action@v6
+        with:
+          manifest-dir: ${{ github.workspace }}
+          triplet: x64-windows-release
+          token: ${{ github.token }}
+          github-binarycache: true
+      - name: Install deps
+        run: npm install --ignore-scripts
+      - name: Prebuild
+        env:
+          CMAKE_TOOLCHAIN_FILE: ${{ github.workspace }}/vcpkg/scripts/buildsystems/vcpkg.cmake
+        run: npx prebuildify --napi
+      - uses: actions/upload-artifact@v4
+        with:
+          name: prebuilds-windows
+          path: prebuilds/
+
+  publish:
+    name: Publish to npm
+    needs: [prebuild_linux, prebuild_macos, prebuild_windows]
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
+    permissions:
+      contents: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+      - name: Download all prebuilds
+        uses: actions/download-artifact@v4
+        with:
+          pattern: prebuilds-*
+          path: prebuilds
+          merge-multiple: true
+      - name: Publish
+        run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+      - name: GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: prebuilds/**/*

@@ -1,0 +1,27 @@
+# Node
+node_modules/
+npm-debug.log*
+yarn-error.log*
+*.tgz
+
+# Native build output
+build/
+prebuilds/
+*.node
+*.o
+*.obj
+
+# CMake
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# vcpkg (Windows/macOS ICU build)
+vcpkg/
+vcpkg_installed/
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db

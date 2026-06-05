@@ -1,0 +1,63 @@
+{
+  "name": "nlpplus",
+  "version": "0.1.0",
+  "description": "Node.js bindings for the NLP++ text-analysis engine (peer of the Python package NLPPlus)",
+  "main": "index.js",
+  "types": "index.d.ts",
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "install": "node scripts/install.js",
+    "build": "cmake-js compile --CDNODE_ADDON_API_DIR=\"$(node -p \"require('node-addon-api').include_dir\")\"",
+    "build:debug": "cmake-js compile --debug --CDNODE_ADDON_API_DIR=\"$(node -p \"require('node-addon-api').include_dir\")\"",
+    "rebuild": "cmake-js rebuild --CDNODE_ADDON_API_DIR=\"$(node -p \"require('node-addon-api').include_dir\")\"",
+    "test": "node --test test/"
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "lib/",
+    "src/",
+    "CMakeLists.txt",
+    "vcpkg.json",
+    "analyzers/",
+    "data/",
+    "nlp-engine/",
+    "prebuilds/"
+  ],
+  "keywords": [
+    "nlp",
+    "nlp++",
+    "text",
+    "text-analysis",
+    "parser",
+    "rule-based",
+    "visualtext",
+    "native",
+    "node-addon"
+  ],
+  "author": "David De Hilster <contact@visualtext.org>",
+  "license": "MIT",
+  "homepage": "https://visualtext.org/",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VisualText/npm-package-nlpengine.git"
+  },
+  "bugs": {
+    "url": "https://github.com/VisualText/npm-package-nlpengine/issues"
+  },
+  "dependencies": {
+    "cmake-js": "^7.3.0",
+    "node-addon-api": "^8.0.0",
+    "tar": "^7.4.0"
+  },
+  "devDependencies": {
+    "prebuildify": "^6.0.0"
+  },
+  "binary": {
+    "napi_versions": [
+      8
+    ]
+  }
+}
