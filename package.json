@@ -9,9 +9,9 @@
   },
   "scripts": {
     "install": "node scripts/install.js",
-    "build": "cmake-js compile --CDNODE_ADDON_API_DIR=\"$(node -p \"require('node-addon-api').include_dir\")\"",
-    "build:debug": "cmake-js compile --debug --CDNODE_ADDON_API_DIR=\"$(node -p \"require('node-addon-api').include_dir\")\"",
-    "rebuild": "cmake-js rebuild --CDNODE_ADDON_API_DIR=\"$(node -p \"require('node-addon-api').include_dir\")\"",
+    "build": "cmake-js compile",
+    "build:debug": "cmake-js compile --debug",
+    "rebuild": "cmake-js rebuild",
     "test": "node test/engine.test.js"
   },
   "files": [
