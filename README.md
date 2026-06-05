@@ -1,5 +1,16 @@
 # nlpplus
 
+[![NLP++ Textbook](https://github.com/VisualText/npm-package-nlpengine/raw/main/assets/TextbookLaunch01_LinkedIn%20Banner.png)](https://book.visualtext.org)
+
+## First Textbook on the NLP++ Programming Language
+
+The first textbook on NLP++ is now available world-wide by [BPB Online](https://book.visualtext.org). NLP++ can replace LLMs when used in agentic flows. The code must be written by a human like any other programming language and this book will facilitate this process. NLP++ is no a statistical system that needs training. It relies on the ingenuity of the programmer to create a program that can parse text and extract information in a deterministic way.
+
+## The nlpplus Node.js Package
+
+[![Test](https://github.com/VisualText/npm-package-nlpengine/actions/workflows/test.yml/badge.svg)](https://github.com/VisualText/npm-package-nlpengine/actions/workflows/test.yml)
+[![Build prebuilds](https://github.com/VisualText/npm-package-nlpengine/actions/workflows/publish.yml/badge.svg)](https://github.com/VisualText/npm-package-nlpengine/actions/workflows/publish.yml)
+
 Node.js bindings for the [NLP++](https://visualtext.org) text-analysis
 engine — the Node peer of the Python package
 [NLPPlus](https://github.com/VisualText/py-package-nlpengine).

@@ -45,10 +45,24 @@ set_target_properties(bindings PROPERTIES PREFIX "" SUFFIX ".node")
 
 # Node + N-API headers from cmake-js.
 target_include_directories(bindings PRIVATE ${CMAKE_JS_INC})
-# node-addon-api headers (location passed in by the npm build script).
-if(DEFINED NODE_ADDON_API_DIR)
-  target_include_directories(bindings PRIVATE ${NODE_ADDON_API_DIR})
+# node-addon-api headers. Resolve the include dir here (cross-platform) so the
+# npm scripts don't need a bash-only `$(...)` substitution that breaks on
+# Windows (cmd.exe doesn't expand it, and the literal $() then trips MSBuild).
+# A caller may still override by passing -DNODE_ADDON_API_DIR=...
+if(NOT NODE_ADDON_API_DIR)
+  execute_process(
+    COMMAND node -p "require('node-addon-api').include_dir"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+    OUTPUT_VARIABLE NODE_ADDON_API_DIR
+    OUTPUT_STRIP_TRAILING_WHITESPACE
+    RESULT_VARIABLE _addon_api_rv)
+  if(NOT _addon_api_rv EQUAL 0)
+    message(FATAL_ERROR "Could not resolve node-addon-api include dir via node. Is node on PATH and `npm install` run?")
+  endif()
 endif()
+# node prints the path with surrounding quotes; strip them.
+string(REPLACE "\"" "" NODE_ADDON_API_DIR "${NODE_ADDON_API_DIR}")
+target_include_directories(bindings PRIVATE ${NODE_ADDON_API_DIR})
 # C++ exceptions are used by node-addon-api wrappers.
 target_compile_definitions(bindings PRIVATE NAPI_CPP_EXCEPTIONS)
 
