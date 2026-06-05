@@ -53,7 +53,9 @@ endif()
 target_compile_definitions(bindings PRIVATE NAPI_CPP_EXCEPTIONS)
 
 if(WIN32)
-  target_link_libraries(bindings PRIVATE prim kbm consh words lite ${CMAKE_JS_LIB})
+  # delayimp.lib provides __delayLoadHelper2, required because the Node addon
+  # links node.lib with /DELAYLOAD:NODE.EXE (set up by cmake-js).
+  target_link_libraries(bindings PRIVATE prim kbm consh words lite ${CMAKE_JS_LIB} delayimp)
 else()
   target_link_libraries(bindings PRIVATE prim kbm consh words lite dl pthread ${CMAKE_JS_LIB})
 endif()

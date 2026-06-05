@@ -11,6 +11,20 @@ prebuilds/
 *.o
 *.obj
 
+# Engine build artifacts dumped into the source tree by the engine's CMake
+# (its CMAKE_*_OUTPUT_DIRECTORY resolves to the top-level source dir).
+# Note: lib/ also holds the package's own JS source, so only ignore the
+# compiled artifacts inside it -- not the directory.
+/bin/
+/lib/*.lib
+/lib/Release/
+/lib/Debug/
+*.exe
+*.lib
+*.exp
+*.pdb
+*.ilk
+
 # CMake
 CMakeCache.txt
 CMakeFiles/
