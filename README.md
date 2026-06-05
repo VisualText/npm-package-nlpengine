@@ -1,5 +1,8 @@
 # nlpplus
 
+[![Test](https://github.com/VisualText/npm-package-nlpengine/actions/workflows/test.yml/badge.svg)](https://github.com/VisualText/npm-package-nlpengine/actions/workflows/test.yml)
+[![Build prebuilds](https://github.com/VisualText/npm-package-nlpengine/actions/workflows/publish.yml/badge.svg)](https://github.com/VisualText/npm-package-nlpengine/actions/workflows/publish.yml)
+
 Node.js bindings for the [NLP++](https://visualtext.org) text-analysis
 engine — the Node peer of the Python package
 [NLPPlus](https://github.com/VisualText/py-package-nlpengine).
