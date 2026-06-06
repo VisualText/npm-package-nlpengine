@@ -41,7 +41,7 @@ jobs:
         run: |
           set -euo pipefail
           before=$(git rev-parse HEAD:analyzers)
-          git submodule update --remote --recursive analyzers
+          git submodule update --remote analyzers
           after=$(git -C analyzers rev-parse HEAD)
           echo "before=$before" >> "$GITHUB_OUTPUT"
           echo "after=$after"   >> "$GITHUB_OUTPUT"
@@ -59,8 +59,12 @@ jobs:
           set -euo pipefail
           git add analyzers
           git commit -m "Bump analyzers submodule to ${{ steps.bump.outputs.after }}"
-          # npm version patch bumps package.json + package-lock and creates the
-          # commit's amend + an annotated vX.Y.Z tag.
+          # Re-sync nested submodules to the just-recorded commit so the working
+          # tree is clean — npm version refuses to run on a dirty tree, and a
+          # bare --remote leaves the nested parse-en-us off its recorded pointer.
+          git submodule update --init --recursive analyzers
+          # npm version patch bumps package.json + package-lock and creates an
+          # annotated vX.Y.Z tag.
           new=$(npm version patch -m "Release %s (analyzers bump)")
           echo "Tagged $new"
           git push origin HEAD
