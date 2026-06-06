@@ -42,10 +42,10 @@ for (const [name, key] of cases) {
     const how =
       res.signal ? `signal ${res.signal}` : `exit ${res.status}`;
     console.log(`not ok - ${name} (${how})`);
-    const tail = (res.stderr || res.stdout || '')
+    const tail = ((res.stderr || '') + (res.stdout || ''))
       .trim()
       .split('\n')
-      .slice(-6)
+      .slice(-40)
       .join('\n  ');
     if (tail) console.log('  ' + tail);
   }
