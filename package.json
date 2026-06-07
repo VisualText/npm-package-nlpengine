@@ -1,6 +1,6 @@
 {
   "name": "nlpplus",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Node.js bindings for the NLP++ text-analysis engine (peer of the Python package NLPPlus)",
   "main": "index.js",
   "types": "index.d.ts",
