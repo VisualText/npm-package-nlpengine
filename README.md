@@ -100,7 +100,7 @@ overwrite your edits.
 | Function | Description |
 |---|---|
 | `analyze(text, parser = 'parse-en-us', develop = false, compiled = false)` | Run an analyzer on `text`, return its output text. |
-| `compile(analyzer = 'parse-en-us', develop = false, kbOnly = false)` | Generate the analyzer's C++ source trees (`-COMPILE`). |
+| `compile(analyzer = 'parse-en-us', develop = false, kbOnly = false, analyzerOnly = false)` | Generate the analyzer's C++ source trees (`-COMPILE`, or `-COMPILEKB` for `kbOnly`, or `-COMPILEANA` for `analyzerOnly`). |
 | `cloudCompile(analyzer = 'parse-en-us', opts?)` | End-to-end compile via the cloud build service (async). |
 | `setWorkingFolder(folder?, initialize = false)` | Re-point the default engine at another working folder. |
 | `setAnalyzersFolder(path)` | Set the analyzers directory used by the default engine. |
@@ -164,10 +164,12 @@ await nlpplus.cloudCompile('parse-en-us');
 const xml = nlpplus.analyze('Hello world.', 'parse-en-us', false, true);
 ```
 
-`cloudCompile()` options: `dispatcherUrl`, `kbOnly`, `develop`,
-`pollInterval`, `timeout` (default 30 min), `skipLocalCompile`. The cloud
-build takes ~1 min (small analyzer, cache hit) up to ~10 min (`parse-en-us`,
-cold Windows runner queue).
+`cloudCompile()` options: `dispatcherUrl`, `kbOnly`, `analyzerOnly`,
+`develop`, `pollInterval`, `timeout` (default 30 min), `skipLocalCompile`.
+Set `analyzerOnly: true` to recompile just the analyzer rules when the KB
+is already compiled (`kbOnly` and `analyzerOnly` are mutually exclusive).
+The cloud build takes ~1 min (small analyzer, cache hit) up to ~10 min
+(`parse-en-us`, cold Windows runner queue).
 
 If you'd rather build the C++ trees yourself, use `compile()` for the
 codegen step and run `cmake` against the engine's
