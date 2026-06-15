@@ -35,8 +35,10 @@ export interface EngineOptions {
 export interface CloudCompileOptions {
   /** Override the public dispatcher endpoint. */
   dispatcherUrl?: string;
-  /** Compile only the knowledge base. */
+  /** Compile only the knowledge base (-COMPILEKB). */
   kbOnly?: boolean;
+  /** Compile only the analyzer rules (-COMPILEANA); skips the KB. Mutually exclusive with kbOnly. */
+  analyzerOnly?: boolean;
   /** Forwarded to the local -COMPILE step. */
   develop?: boolean;
   /** Seconds between job-status checks. */
@@ -62,7 +64,7 @@ export class Engine {
     compiled?: boolean,
   ): Results;
   /** Generate C++ source files for the named analyzer (-COMPILE mode). */
-  compile(analyzerName: string, develop?: boolean, kbOnly?: boolean): string;
+  compile(analyzerName: string, develop?: boolean, kbOnly?: boolean, analyzerOnly?: boolean): string;
   /** End-to-end compile via the nlp-compile-service cloud. Returns the bin/ dir. */
   cloudCompile(analyzerName: string, opts?: CloudCompileOptions): Promise<string>;
   /** Return the text from a file in the analyzer's input directory. */
@@ -105,6 +107,7 @@ export function compile(
   analyzer?: string,
   develop?: boolean,
   kbOnly?: boolean,
+  analyzerOnly?: boolean,
 ): string;
 
 /** Compile an analyzer end-to-end via the nlp-compile-service cloud. */

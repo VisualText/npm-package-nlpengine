@@ -55,13 +55,16 @@ std::string analyze_impl(NLP_ENGINE &engine, const std::string &parser,
 // or the nlp-compile-service in the cloud -- before they can be loaded via
 // analyze(..., compiled=true).
 //
-// `kbOnly=true` switches to KB-only codegen.
+// `kbOnly=true` switches to KB-only codegen (-COMPILEKB).
+// `analyzerOnly=true` switches to analyzer-only codegen (-COMPILEANA),
+// emitting just <analyzer>/run/ and leaving the KB alone.  Mutually
+// exclusive with kbOnly.
 void compile_impl(NLP_ENGINE &engine, const std::string &analyzer,
-                  bool develop, bool kbOnly) {
+                  bool develop, bool kbOnly, bool analyzerOnly) {
   _TCHAR *_analyzer = _tcsdup(analyzer.c_str());
   engine.init(_analyzer, develop, /*silent*/ false,
-              /*compile*/ !kbOnly, /*compiled*/ false,
-              /*compileKB*/ kbOnly);
+              /*compile*/ (!kbOnly && !analyzerOnly), /*compiled*/ false,
+              /*compileKB*/ kbOnly, /*compileAna*/ analyzerOnly);
   free(_analyzer);
 }
 
@@ -160,7 +163,7 @@ class Engine : public Napi::ObjectWrap<Engine> {
     }
   }
 
-  // compile(analyzer, develop = false, kbOnly = false): void
+  // compile(analyzer, develop = false, kbOnly = false, analyzerOnly = false): void
   Napi::Value Compile(const Napi::CallbackInfo &info) {
     Napi::Env env = info.Env();
     if (!EnsureOpen(env)) return env.Undefined();
@@ -171,8 +174,11 @@ class Engine : public Napi::ObjectWrap<Engine> {
     bool kbOnly = info.Length() > 2 && info[2].IsBoolean()
                       ? info[2].As<Napi::Boolean>().Value()
                       : false;
+    bool analyzerOnly = info.Length() > 3 && info[3].IsBoolean()
+                      ? info[3].As<Napi::Boolean>().Value()
+                      : false;
     try {
-      compile_impl(*engine_, analyzer, develop, kbOnly);
+      compile_impl(*engine_, analyzer, develop, kbOnly, analyzerOnly);
     } catch (const std::exception &e) {
       Napi::Error::New(env, e.what()).ThrowAsJavaScriptException();
     }
