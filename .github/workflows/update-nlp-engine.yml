@@ -1,0 +1,78 @@
+# Install at: VisualText/npm-package-nlpengine -> .github/workflows/update-nlp-engine.yml
+#
+# Listener in the cross-repo percolation chain (see
+# VisualText/nlp-engine/docs/PERCOLATION.md).
+#
+# Fully automatic: when nlp-engine releases (event-type nlp-engine-release),
+# bump the `nlp-engine` submodule, bump the package patch version, commit and
+# push a v* tag. The tag fires publish.yml, which builds the prebuilds and
+# publishes to npm (OIDC trusted publisher).
+#
+# The commit + tag are pushed with CLASSIC_PAT so the tag actually triggers
+# publish.yml (a GITHUB_TOKEN-pushed tag would not).
+
+name: Update nlp-engine & publish
+
+on:
+  workflow_dispatch: {}
+  repository_dispatch:
+    types: [nlp-engine-release]
+
+permissions:
+  contents: write
+
+jobs:
+  bump-and-release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+          fetch-depth: 0
+          token: ${{ secrets.CLASSIC_PAT }}
+
+      - name: Configure git identity
+        run: |
+          git config user.name  'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+
+      - name: Move nlp-engine to latest upstream
+        id: bump
+        run: |
+          set -euo pipefail
+          before=$(git rev-parse HEAD:nlp-engine)
+          git submodule update --remote nlp-engine
+          after=$(git -C nlp-engine rev-parse HEAD)
+          echo "before=$before" >> "$GITHUB_OUTPUT"
+          echo "after=$after"   >> "$GITHUB_OUTPUT"
+          if [ "$before" = "$after" ]; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "nlp-engine already current ($after) — nothing to publish"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+            echo "nlp-engine: $before -> $after"
+          fi
+
+      - name: Bump version, commit, tag, push
+        if: steps.bump.outputs.changed == 'true'
+        run: |
+          set -euo pipefail
+          git add nlp-engine
+          git commit -m "Bump nlp-engine submodule to ${{ steps.bump.outputs.after }}"
+          # Re-sync nested submodules to the just-recorded commit so the working
+          # tree is clean — npm version refuses to run on a dirty tree.
+          git submodule update --init --recursive nlp-engine
+          # npm version patch bumps package.json + package-lock and creates an
+          # annotated vX.Y.Z tag.
+          new=$(npm version patch -m "Release %s (nlp-engine bump)")
+          echo "Tagged $new"
+          git push origin HEAD
+          git push origin "$new"
+
+      - name: Summary
+        run: |
+          {
+            echo "### Update nlp-engine & publish"
+            echo "- nlp-engine changed: \`${{ steps.bump.outputs.changed }}\`"
+            echo "- nlp-engine: \`${{ steps.bump.outputs.before }}\` → \`${{ steps.bump.outputs.after }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
