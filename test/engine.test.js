@@ -37,6 +37,7 @@ const cases = [
   // fails. Tracked for a real fix in the nlp-engine C++ submodule.
   ['bundled emailaddress analyzer returns structured output', 'emailaddress',
     { tolerateLinuxCrash: true }],
+  ['putJsonFile/putJsonObject place JSON in kb/user', 'put-json'],
 ];
 
 let failed = 0;
