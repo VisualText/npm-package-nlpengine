@@ -112,8 +112,10 @@ jobs:
           node-version: '20'
           registry-url: 'https://registry.npmjs.org'
       # Trusted publishing (OIDC) needs npm >= 11.5.1; Node 20 ships npm 10.
+      # Pin to npm 11 rather than @latest: npm 12 requires Node >=22 and
+      # fails EBADENGINE on this Node 20 runner, which killed the publish.
       - name: Upgrade npm for trusted publishing
-        run: npm install -g npm@latest
+        run: npm install -g npm@11
       - name: Download all prebuilds
         uses: actions/download-artifact@v4
         with:
