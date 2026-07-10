@@ -1,5 +1,9 @@
 'use strict';
 
+const fs = require('node:fs');
+const os = require('node:os');
+const nodePath = require('node:path');
+
 // Runs a SINGLE test case in its own process, then hard-exits.
 //
 // Why a process per case: the NLP++ engine keeps process-global state, so on
@@ -51,6 +55,28 @@ switch (which) {
       'expected output.email_address to be an array',
     );
     assert.strictEqual(r.output.email_address[0].domainname, 'example');
+    break;
+  }
+  case 'put-json': {
+    // put_json_* is pure file placement into <analyzer>/kb/user — no analyze
+    // run, so it's stable on every platform. Use a fresh temp working folder
+    // seeded with the bundled analyzers.
+    const wf = fs.mkdtempSync(nodePath.join(os.tmpdir(), 'nlpjson-'));
+    nlpplus.setWorkingFolder(wf, true);
+    const kbuser = nodePath.join(wf, 'analyzers', 'emailaddress', 'kb', 'user');
+
+    // putJsonObject: object serialized, .json appended.
+    const dObj = nlpplus.putJsonObject('emailaddress', { company: { name: 'Acme' } }, 'company');
+    assert.strictEqual(dObj, nodePath.join(kbuser, 'company.json'));
+    assert.deepStrictEqual(JSON.parse(fs.readFileSync(dObj, 'utf8')), { company: { name: 'Acme' } });
+    assert.strictEqual(nodePath.basename(nlpplus.putJsonObject('emailaddress', [1, 2, 3], 'nums')), 'nums.json');
+
+    // putJsonFile: default name, explicit name, and missing-file error.
+    const src = nodePath.join(wf, 'src.json');
+    fs.writeFileSync(src, '{"x": [1, 2]}', 'utf8');
+    assert.strictEqual(nlpplus.putJsonFile('emailaddress', src), nodePath.join(kbuser, 'src.json'));
+    assert.strictEqual(nodePath.basename(nlpplus.putJsonFile('emailaddress', src, 'renamed')), 'renamed.json');
+    assert.throws(() => nlpplus.putJsonFile('emailaddress', nodePath.join(wf, 'nope.json')), nlpplus.EngineException);
     break;
   }
   default:

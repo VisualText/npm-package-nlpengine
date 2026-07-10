@@ -73,6 +73,17 @@ export class Engine {
   setAnalyzersFolder(analyzerPath: string): void;
   /** Copy the bundled library analyzers into a writable directory. */
   copyLibraryAnalyzers(toDir: string, overwrite?: boolean): void;
+  /**
+   * Place a JSON file in the analyzer's `kb/user` directory (so its `json2kbb`
+   * pass converts it to a KBB). Copied to `<analyzer>/kb/user/<name>.json`
+   * (name defaults to the source file name). Returns the destination path.
+   */
+  putJsonFile(analyzerName: string, jsonPath: string, name?: string | null): string;
+  /**
+   * Write a JSON-serializable value to the analyzer's `kb/user` directory.
+   * Serialized to `<analyzer>/kb/user/<name>.json`. Returns the destination path.
+   */
+  putJsonObject(analyzerName: string, obj: unknown, name: string): string;
 }
 
 /** Return the bundled nlp-engine version string (e.g. "3.1.55"). */
@@ -118,3 +129,23 @@ export function cloudCompile(
 
 /** Return the text from a file in the analyzer's input directory. */
 export function inputText(analyzerName: string, fileName: string): string;
+
+/**
+ * Place a JSON file in the analyzer's `kb/user` directory so its `json2kbb`
+ * pass converts it to a KBB. Returns the destination path.
+ */
+export function putJsonFile(
+  analyzerName: string,
+  jsonPath: string,
+  name?: string | null,
+): string;
+
+/**
+ * Write a JSON-serializable value to the analyzer's `kb/user` directory so its
+ * `json2kbb` pass converts it to a KBB. Returns the destination path.
+ */
+export function putJsonObject(
+  analyzerName: string,
+  obj: unknown,
+  name: string,
+): string;

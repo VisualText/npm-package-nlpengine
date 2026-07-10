@@ -106,6 +106,8 @@ overwrite your edits.
 | `setAnalyzersFolder(path)` | Set the analyzers directory used by the default engine. |
 | `copyLibraryAnalyzers(toDir, overwrite = true)` | Copy bundled analyzers somewhere writable. |
 | `inputText(analyzer, fileName)` | Read a file from the analyzer's `input/` dir. |
+| `putJsonFile(analyzer, jsonPath, name?)` | Copy a JSON file into the analyzer's `kb/user/` dir for its `json2kbb` pass. |
+| `putJsonObject(analyzer, obj, name)` | Serialize a JSON value into the analyzer's `kb/user/<name>.json`. |
 | `engineVersion()` | Bundled nlp-engine version string (e.g. `"3.1.55"`). |
 
 These are thin wrappers over a module-level default `Engine`, exported as
@@ -126,7 +128,8 @@ const engine = new Engine({ workingFolder, verbose, initialize });
   bundled analyzers and data.
 
 Methods: `analyze`, `compile`, `cloudCompile`, `inputText`,
-`setAnalyzersFolder`, `copyLibraryAnalyzers`, `close`.
+`setAnalyzersFolder`, `copyLibraryAnalyzers`, `putJsonFile`, `putJsonObject`,
+`close`.
 
 > **Always call `engine.close()`** (e.g. in a `finally`) when you create an
 > `Engine` explicitly. On Windows the engine holds a handle on
