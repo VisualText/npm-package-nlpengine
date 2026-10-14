@@ -128,7 +128,19 @@ jobs:
       # is generated automatically from the OIDC claims.
       - name: Publish
         run: npm publish --provenance --access public
+      # One archive per platform: every platform ships a file named
+      # bindings.node, and release assets are flat, so uploading
+      # prebuilds/**/* made three same-named uploads race (overwrite_files
+      # deletes the other's asset -> 404) and kept at most one platform.
+      - name: Package prebuilds per platform
+        run: |
+          mkdir -p release-assets
+          for d in prebuilds/*/; do
+            plat=$(basename "$d")
+            tar -czf "release-assets/nlpplus-${GITHUB_REF_NAME}-${plat}.tar.gz" -C prebuilds "$plat"
+          done
+          ls -l release-assets
       - name: GitHub release
         uses: softprops/action-gh-release@v2
         with:
-          files: prebuilds/**/*
+          files: release-assets/*
