@@ -12,6 +12,7 @@ The first textbook on NLP++ is now available world-wide by [BPB Online](https://
 
 [![Test](https://github.com/VisualText/npm-package-nlpengine/actions/workflows/test.yml/badge.svg)](https://github.com/VisualText/npm-package-nlpengine/actions/workflows/test.yml)
 [![Build prebuilds](https://github.com/VisualText/npm-package-nlpengine/actions/workflows/publish.yml/badge.svg)](https://github.com/VisualText/npm-package-nlpengine/actions/workflows/publish.yml)
+[![NLPPlus Node.js Bindings on StartupScores](https://startupscores.com/badge/nlpplus-node-js-bindings.svg?style=shield&v=combo&theme=dark)](https://startupscores.com/open-source/nlpplus-node-js-bindings)
 
 Node.js bindings for the [NLP++](https://visualtext.org) text-analysis
 engine — the Node peer of the Python package
