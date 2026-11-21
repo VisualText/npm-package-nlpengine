@@ -1,5 +1,7 @@
 # nlpplus
 
+[![PyPI: NLPPlus](https://img.shields.io/pypi/v/NLPPlus?label=PyPI%20NLPPlus&logo=pypi&logoColor=white)](https://pypi.org/project/NLPPlus/) [![npm: nlpplus](https://img.shields.io/npm/v/nlpplus?label=npm%20nlpplus&logo=npm)](https://www.npmjs.com/package/nlpplus)
+
 **NLP++ lets you build fully customized text analyzers using the [NLP++ VSCode language extension](https://vscode.visualtext.org), giving you 100% visibility into — and complete control over — every rule and decision your analyzer makes. Unlike other NLP packages that are statistical black boxes you cannot inspect or change, every NLP++ analyzer is glass-box code you own and can tailor to your exact needs.**
 
 [![NLP++ Textbook](https://github.com/VisualText/npm-package-nlpengine/raw/main/assets/TextbookLaunch01_LinkedIn%20Banner.png)](https://book.visualtext.org)
