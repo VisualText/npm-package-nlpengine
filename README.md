@@ -17,7 +17,7 @@ The first textbook on NLP++ is now available world-wide by [BPB Online](https://
 
 Node.js bindings for the [NLP++](https://visualtext.org) text-analysis
 engine — the Node peer of the Python package
-[NLPPlus](https://github.com/VisualText/py-package-nlpengine).
+[NLPPlus](https://pypi.org/project/NLPPlus/).
 
 `nlpplus` lets Node scripts call text and NLP analyzers written in
 [NLP++](https://visualtext.org). It links the C++ libraries of the
